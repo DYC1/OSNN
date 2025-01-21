@@ -1,6 +1,6 @@
 # Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System
 
-This repository is the official implementation of the paper **"Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System"**. 
+This repository is the official implementation of the paper **"Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System"**, see [*link*](https://arxiv.org/abs/2308.11925). 
 
 
 
@@ -49,5 +49,13 @@ python -c "import jax; print(jax.__version__)"
 If you use this code, please cite the following paper:
 
 ```
-
+@misc{dai2024solvingellipticoptimalcontrol,
+      title={Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System}, 
+      author={Yongcheng Dai and Bangti Jin and Ramesh Sau and Zhi Zhou},
+      year={2024},
+      eprint={2308.11925},
+      archivePrefix={arXiv},
+      primaryClass={math.OC},
+      url={https://arxiv.org/abs/2308.11925}, 
+}
 ```
