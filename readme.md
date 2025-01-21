@@ -48,7 +48,7 @@ python -c "import jax; print(jax.__version__)"
 ## Citation
 If you use this code, please cite the following paper:
 
-```
+```tex
 @misc{dai2024solvingellipticoptimalcontrol,
       title={Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System}, 
       author={Yongcheng Dai and Bangti Jin and Ramesh Sau and Zhi Zhou},
