@@ -49,13 +49,5 @@ python -c "import jax; print(jax.__version__)"
 If you use this code, please cite the following paper:
 
 ```
-@article{author2023elliptic,
-  title={Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System},
-  author={Firstname Author and Secondname Author},
-  journal={Journal Name},
-  year={2023},
-  volume={XX},
-  number={YY},
-  pages={ZZ--ZZ},
-}
+
 ```
