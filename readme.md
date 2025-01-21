@@ -31,7 +31,7 @@ It is recommended to install these libraries following the official installation
 2. Install JAX following the instructions on the official [JAX](https://jax.readthedocs.io/en/latest/quickstart.html) website to ensure compatibility with your CUDA version. For example, to install with GPU support, use:
    ```bash
    pip install --upgrade pip
-   pip install jax[cuda12]  # Ensure you install the correct version for your CUDA
+   pip install -U "jax[cuda12]"  # Ensure you install the correct version for your CUDA
    ```
 
 3. Install other dependencies using `pip`:
