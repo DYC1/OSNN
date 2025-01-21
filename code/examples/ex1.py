@@ -3,12 +3,18 @@ from header import *
 import argparse
 # %%
 parser = argparse.ArgumentParser(description='Hyperparameters for the model')
-parser.add_argument('--MCSizeIn', type=int, default=int(6e4), help='Size of MC input')
-parser.add_argument('--MCsizeB', type=int, default=int(5e3)//8, help='Size of MC boundary')
-parser.add_argument('--LearningRateStart', type=float, default=1e-3, help='Initial learning rate')
-parser.add_argument('--DecayRate', type=float, default=0.5, help='Decay rate for learning rate')
-parser.add_argument('--Epoach', type=int, default=int(6e4), help='Number of epochs')
-parser.add_argument('--EpoachDecay', type=int, default=int(6000), help='Epochs before decay')
+parser.add_argument('--MCSizeIn', type=int,
+                    default=int(6e4), help='Size of MC input')
+parser.add_argument('--MCsizeB', type=int, default=int(5e3) //
+                    8, help='Size of MC boundary')
+parser.add_argument('--LearningRateStart', type=float,
+                    default=1e-3, help='Initial learning rate')
+parser.add_argument('--DecayRate', type=float, default=0.5,
+                    help='Decay rate for learning rate')
+parser.add_argument('--Epoach', type=int, default=int(6e4),
+                    help='Number of epochs')
+parser.add_argument('--EpoachDecay', type=int,
+                    default=int(6000), help='Epochs before decay')
 parser.add_argument('--alpha', type=float, default=100, help='Alpha parameter')
 parser.add_argument('--mu', type=float, default=2, help='Mu parameter')
 
@@ -59,7 +65,7 @@ def LossAll(ynn, pnn, lapY, lapP, paras, _key):
 
 def LossJ(ynn: NN, unn: NN, Paras: Any, key) -> Array:
     _x = random.uniform(key, (MCSizeIn, DimInput))
-    return 0.5*(L2Norm(ynn(_x,Paras['yNet']) - yData(ynn, _x,Paras)) + L2Norm(lam*(unn(_x,Paras['pNet']))))
+    return 0.5*(L2Norm(ynn(_x, Paras['yNet']) - yData(ynn, _x, Paras)) + L2Norm(lam*(unn(_x, Paras['pNet']))))
 
 
 # %%
@@ -90,37 +96,39 @@ opt = optimizer.init(Paras)
 lossFn = jit(lambda _para, key: LossAll(ynn, pnn, LapY, LapP, _para, key))
 gradFn = jit(value_and_grad(lossFn, argnums=0))
 JFn = jit(lambda _para, key: LossJ(ynn, unn, _para, key))
-Pfn= jit(lambda _para,key:LossP(ynn,pnn,LapP,random.uniform(key,(MCSizeIn, DimInput)),_para))
-PinnFn= jit(lambda _para,key:LossPinn(ynn,LapY,pnn,random.uniform(key,(MCSizeIn, DimInput)),_para))
+Pfn = jit(lambda _para, key: LossP(ynn, pnn, LapP,
+          random.uniform(key, (MCSizeIn, DimInput)), _para))
+PinnFn = jit(lambda _para, key: LossPinn(ynn, LapY, pnn,
+             random.uniform(key, (MCSizeIn, DimInput)), _para))
 # %%
-LstLoss=[0.0]*Epoach
-LstJ=[0.0]*Epoach
-LstP=[0.0]*Epoach
-LstPinn=[0.0]*Epoach
-#%%
+LstLoss = [0.0]*Epoach
+LstJ = [0.0]*Epoach
+LstP = [0.0]*Epoach
+LstPinn = [0.0]*Epoach
+# %%
 ProcessBar = tqdm(range(Epoach))
 
 for idx in ProcessBar:
-    
+
     value, grads = gradFn(Paras, key)
     updates, opt = optimizer.update(grads, opt)
     ProcessBar.set_postfix(Loss=value)
     Paras = optax.apply_updates(Paras, updates)
-    LstLoss[idx]=value
-    LstJ[idx]=JFn(Paras,key)
-    LstP[idx]=Pfn(Paras,key)
-    LstPinn[idx]=PinnFn(Paras,key)
+    LstLoss[idx] = value
+    LstJ[idx] = JFn(Paras, key)
+    LstP[idx] = Pfn(Paras, key)
+    LstPinn[idx] = PinnFn(Paras, key)
     if idx % 1000 == 0:
-        checkpointer.save(checkpath/f'{idx}',Paras)
+        checkpointer.save(checkpath/f'{idx}', Paras)
     key = random.split(key)[0]
 # LapP(x)
-#%%
-checkpointer.save(checkpath/f'final',Paras)
-#%%
-checkpointer.save(checkpath/f'Loss',{'Loss' : np.array(LstLoss)})
-checkpointer.save(checkpath/f'J',{'J':np.array(LstJ)})
-checkpointer.save(checkpath/f'P',{'P':np.array(LstP)})
-checkpointer.save(checkpath/f'Pinn',{'Pinn':np.array(LstPinn)})
+# %%
+checkpointer.save(checkpath/f'final', Paras)
+# %%
+checkpointer.save(checkpath/f'Loss', {'Loss': np.array(LstLoss)})
+checkpointer.save(checkpath/f'J', {'J': np.array(LstJ)})
+checkpointer.save(checkpath/f'P', {'P': np.array(LstP)})
+checkpointer.save(checkpath/f'Pinn', {'Pinn': np.array(LstPinn)})
 # %%
 dpi = 300
 X = np.linspace(0, 1, dpi)
@@ -144,7 +152,6 @@ plt.axis('off')
 plt.tight_layout()
 plt.savefig(f'./figs/U{Timetxt}.pdf')
 # %%
-
 
 
 # %%

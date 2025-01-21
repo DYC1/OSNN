@@ -1,4 +1,5 @@
 # %%
+import orbax.checkpoint as ocp
 import jax.numpy as np
 from jax.typing import ArrayLike as Tensor
 
@@ -14,14 +15,13 @@ from functools import partial
 import time
 import subprocess
 import os
-from typing import List, Tuple, Union, Callable, Sequence,Any
+from typing import List, Tuple, Union, Callable, Sequence, Any
 import flax.linen as nn
-from flax.typing import PRNGKey,VariableDict
+from flax.typing import PRNGKey, VariableDict
 import optax
 
 
-
-#%%
+# %%
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 
 
@@ -58,16 +58,20 @@ def get_min_memory_gpu():
 
 os.environ["CUDA_VISIBLE_DEVICES"] = get_min_memory_gpu()
 Function = Callable[[Tensor], Array]
-NN=Callable[[Tensor,VariableDict],Array]
+NN = Callable[[Tensor, VariableDict], Array]
 # global Device,Dtype
 key = random.PRNGKey(42)
-uniform = lambda shape: random.uniform(key, shape)
+def uniform(shape): return random.uniform(key, shape)
+
+
 pi = np.pi
 try:
     print(Timetxt)
 except:
     Timetxt = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
 # %%
+
+
 def CreateGrad(fun: Function, dim: int) -> Function:
     """
     Creates a gradient function for the given function `fun` with respect to the specified dimension `dim`.
@@ -94,8 +98,10 @@ def CreateLaplace(fun: Function, dim: int) -> Function:
     """
 
     return jit(lambda _xx: ((vmap(lambda _x: np.trace(hessian(lambda _x: fun(_x.reshape(-1, dim)).reshape())(_x))))(_xx)))
+
+
 @jit
-def L2Norm(x:Tensor)->Array:
+def L2Norm(x: Tensor) -> Array:
     def L2Norm(x: Tensor) -> Array:
         """
         Compute the square of L2 norm (Euclidean norm) of a tensor.
@@ -106,7 +112,6 @@ def L2Norm(x:Tensor)->Array:
         """
 
     return (np.mean((np.square(x))))
-
 
 
 # %%
@@ -128,10 +133,10 @@ class MLP(nn.Module):
         to the input `x` and returns the output of the final layer.
     """
 
-    layer_sizes: Sequence[int] = None  
+    layer_sizes: Sequence[int] = None
 
     def setup(self, Activation=nn.tanh):
-        
+
         self.layers = [nn.Dense(features=size)
                        for size in self.layer_sizes[1:]]
         self.act = Activation
@@ -159,7 +164,7 @@ class RNN(nn.Module):
         The output of the network after performing a forward pass.
     """
 
-    layer_sizes: Sequence[int] = None  
+    layer_sizes: Sequence[int] = None
 
     def setup(self, Activation=nn.tanh):
         self.layers = [nn.Dense(features=size)
@@ -188,13 +193,15 @@ def CreateNN(NN, InputDim: int, OutputDim: int, Depth: int, width, Activation=nn
     Returns:
         Tuple[nn.Module, VariableDict]: A tuple containing the instantiated neural network and its parameters.
     """
-    
+
     _nn = NN(layer_sizes=[InputDim]+[width]*Depth+[OutputDim])
     _x = np.zeros((1, InputDim))
     params = _nn.init(key, _x)
     return _nn, params
 
 # %%
+
+
 def CreateGradNN(fun: NN, dim: int) -> NN:
     """
     Creates a gradient neural network (NN) function.
@@ -208,7 +215,7 @@ def CreateGradNN(fun: NN, dim: int) -> NN:
         NN: A new neural network function that computes the gradient of `fun`.
     """
 
-    return jit(lambda _xx,para: ((vmap(grad(lambda _x: fun(_x.reshape(-1, dim),para).reshape())))(_xx)))
+    return jit(lambda _xx, para: ((vmap(grad(lambda _x: fun(_x.reshape(-1, dim), para).reshape())))(_xx)))
 
 
 def CreateLaplaceNN(fun: NN, dim: int) -> NN:
@@ -225,9 +232,9 @@ def CreateLaplaceNN(fun: NN, dim: int) -> NN:
         NN: A new neural network function that computes the Laplacian of the 
         original function.
     """
-    
-    return jit(lambda _xx,para: ((vmap(lambda _x: np.trace(hessian(lambda _x: fun(_x.reshape(-1, dim),para).reshape())(_x))))(_xx)))
 
-import orbax.checkpoint as ocp
+    return jit(lambda _xx, para: ((vmap(lambda _x: np.trace(hessian(lambda _x: fun(_x.reshape(-1, dim), para).reshape())(_x))))(_xx)))
+
+
 checkpath = ocp.test_utils.erase_and_create_empty(f'./data/{Timetxt}')
 checkpointer = ocp.StandardCheckpointer()
