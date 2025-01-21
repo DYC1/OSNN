@@ -96,6 +96,15 @@ def CreateLaplace(fun: Function, dim: int) -> Function:
     return jit(lambda _xx: ((vmap(lambda _x: np.trace(hessian(lambda _x: fun(_x.reshape(-1, dim)).reshape())(_x))))(_xx)))
 @jit
 def L2Norm(x:Tensor)->Array:
+    def L2Norm(x: Tensor) -> Array:
+        """
+        Compute the square of L2 norm (Euclidean norm) of a tensor.
+        Parameters:
+        x (Tensor): Input tensor.
+        Returns:
+        Array: The square of L2 norm of the input tensor.
+        """
+
     return (np.mean((np.square(x))))
 
 
