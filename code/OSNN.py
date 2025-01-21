@@ -1,17 +1,29 @@
 # %%
 from NGD import *
-import sys
+import argparse
 # %%
-MCSizeIn = int(6e4)
-MCsizeB = int(5e3)//8
-LearningRateStart = 1e-3
+parser = argparse.ArgumentParser(description='Hyperparameters for the model')
+parser.add_argument('--MCSizeIn', type=int, default=int(6e4), help='Size of MC input')
+parser.add_argument('--MCsizeB', type=int, default=int(5e3)//8, help='Size of MC boundary')
+parser.add_argument('--LearningRateStart', type=float, default=1e-3, help='Initial learning rate')
+parser.add_argument('--DecayRate', type=float, default=0.5, help='Decay rate for learning rate')
+parser.add_argument('--Epoach', type=int, default=int(6e4), help='Number of epochs')
+parser.add_argument('--EpoachDecay', type=int, default=int(8000), help='Epochs before decay')
+parser.add_argument('--alpha', type=float, default=100, help='Alpha parameter')
+parser.add_argument('--mu', type=float, default=2, help='Mu parameter')
+
+args = parser.parse_args()
+
+MCSizeIn = args.MCSizeIn
+MCsizeB = args.MCsizeB
+LearningRateStart = args.LearningRateStart
+DecayRate = args.DecayRate
+Epoach = args.Epoach
+EpoachDecay = args.EpoachDecay
+alpha = args.alpha
+mu = args.mu
 
 
-DecayRate = 0.5
-Epoach = int(6e4)
-EpoachDecay = int(8000)
-alpha = 100
-mu = 2
 lam = 0.01
 DimInput = 4
 NumLayer = 4
@@ -20,14 +32,10 @@ Activation = nn.tanh
 
 
 def yData(ynn: Function, x: Tensor, para) -> Array:
-    # return (1.0+16*lam*(pi**4))*torch.prod(torch.sin(x),dim=1).reshape(-1,1)
     return (1.0+16*lam*(pi**4))*np.prod(np.sin(x*pi), axis=1).reshape(-1, 1)
 
 
 def LossPinn(ynn: Function, lapY: Function, pnn: Function, _x: Tensor, para) -> Array:
-    # _x = torch.rand(MCsizeB, DimInput, device=Device, dtype=Dtype)
-    # _laplaceY = lapY(_x)
-    # _laplaceP=Laplace(pnn,_x,DimInput)
     return L2Norm(((lapY(_x, para['yNet'])).reshape(-1, 1))-((1.0/lam)*pnn(_x, para['pNet']).reshape(-1, 1)))
 
 
@@ -42,15 +50,11 @@ def LossBoundary(fnn: Function, para, _key) -> Array:
         _x = random.uniform(_key, (MCsizeB, DimInput))
         _x = _x.at[:, idx//2].set(idx % 2)
         _y = L2Norm(fnn(_x, para))+_y
-    # _y=(fnn(_x))
     return _y
 
 
 def LossAll(ynn, pnn, lapY, lapP, paras, _key):
     _x = random.uniform(_key, (MCSizeIn, DimInput))
-    # print(LossPinn(ynn,lapY,pnn,_x,paras))
-    # print(LossP(ynn,pnn,lapP,_x,paras))
-
     return LossPinn(ynn, lapY, pnn, _x, paras)+10*LossP(ynn, pnn, lapP, _x, paras)+alpha*(LossBoundary(ynn, paras['yNet'], _key)+10*LossBoundary(pnn, paras['pNet'], _key))
 
 
