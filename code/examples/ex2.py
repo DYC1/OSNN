@@ -10,7 +10,7 @@ parser.add_argument('--MCsizeB', type=int, default=int(5e3)//8, help='Size of MC
 parser.add_argument('--LearningRateStart', type=float, default=1e-3, help='Initial learning rate')
 parser.add_argument('--DecayRate', type=float, default=0.5, help='Decay rate for learning rate')
 parser.add_argument('--Epoach', type=int, default=int(6e4), help='Number of epochs')
-parser.add_argument('--EpoachDecay', type=int, default=int(8000), help='Epochs before decay')
+parser.add_argument('--EpoachDecay', type=int, default=int(6000), help='Epochs before decay')
 parser.add_argument('--alpha', type=float, default=100, help='Alpha parameter')
 parser.add_argument('--mu', type=float, default=2, help='Mu parameter')
 
