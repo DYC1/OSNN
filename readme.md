@@ -1,6 +1,6 @@
 # Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System
 
-This repository is the official implementation of the paper **"Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System"**, see [*link*](https://arxiv.org/abs/2308.11925). 
+This repository is the official implementation of the paper [**"Solving Elliptic Optimal Control Problems via Neural Networks and Optimality System"**](https://arxiv.org/abs/2308.11925). 
 
 
 
