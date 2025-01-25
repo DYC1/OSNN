@@ -176,4 +176,3 @@ dependencies:
       - widgetsnbextension==4.0.13
       - yarg==0.1.9
       - zipp==3.20.2
-prefix: /home/dyc/anaconda3/envs/jax
